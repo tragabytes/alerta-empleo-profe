@@ -1,6 +1,16 @@
-# Plan: vigia-profe — Bot de alertas de empleo docente
+# Plan: alerta-empleo-profe — Bot de alertas de empleo docente
 
 Bot de Telegram + dashboard web para alertas de empleo docente en Madrid (oposiciones, interinidad, colegios privados, ELE). Basado en la arquitectura de [vigia-enfermeria](https://github.com/tragabytes/vigia-enfermeria).
+
+## Estado actual
+
+| Recurso | URL |
+|---|---|
+| Repo | https://github.com/tragabytes/alerta-empleo-profe |
+| Dashboard | https://tragabytes.github.io/alerta-empleo-profe/ |
+| Cron | Lunes-viernes 08:00 UTC (~10:00 España) |
+| Sprints completados | **Sprint 1** ✅ |
+| Sprint en curso | — (siguiente: Sprint 2, InfoJobs + Jooble) |
 
 ---
 
@@ -34,17 +44,23 @@ Reutilizable sin cambios (~70%): `storage.py`, `enricher.py`, `notifier.py`, `da
 
 ## Sprints
 
-### Sprint 1 — Núcleo público
+### Sprint 1 — Núcleo público ✅ Completado (2026-04-26)
 Cubre el 80% del valor para oposiciones e interinidad oficial.
 
-- Adaptar `sources/boe.py`: filtrar por `MINISTERIO DE EDUCACIÓN, FORMACIÓN PROFESIONAL Y DEPORTES`, Cuerpo 0590 (PES), especialidad 005 (Geografía e Historia)
-- Reescribir `sources/bocm.py`: usar 3 RSS oficiales en lugar de PDF scraping
-  - `https://www.bocm.es/boletines.rss`
-  - `https://www.bocm.es/sumarios.rss`
-  - `https://www.bocm.es/ultimo-boletin.xml`
-- Implementar regex maestro de docencia en `config.py`
-- Filtro de municipios objetivo (16 del noroeste)
-- Filtro de exclusión: descartar `bilingüe.{0,30}inglés` cuando todo el rol sea en inglés
+- ✅ `sources/boe.py`: filtrado por departamentos MEFD, AECID, Cervantes, Comunidad de Madrid, universidades.
+- ✅ `sources/bocm.py`: descubrimiento desde RSS (`boletines.rss` + `sumarios.rss`) reconstruyendo URLs XML canónicas a partir de fecha + nº de boletín.
+- ✅ `config.py` con regex maestro docente (Cuerpo 0590/0592, especialidad 005, lectorados, ELE), 16 municipios noroeste, 25 organismos en watchlist.
+- ✅ Falsos positivos: maestros (cuerpo 0597), PDI universitario, roles bilingües 100% en inglés, nombramientos universitarios.
+- ✅ Enricher Claude con system prompt adaptado al perfil docente.
+- ✅ Notifier Telegram con labels docentes y categorías nuevas (lectorado, auxiliar, privada, ele).
+- ✅ Web dashboard adaptada (título, tagline, diagrama de pipeline).
+- ✅ CI/CD: GitHub Actions diario, ramas `state` y `gh-pages`.
+- ✅ 41 tests verdes.
+
+**Hallazgos durante el despliegue (lecciones para Sprints siguientes):**
+- BOCM RSS no expone XMLs directos — hay que reconstruir la URL canónica desde el patrón `/boletin/CM_Boletin_BOCM/{Y}/{M}/{D}/BOCM-{YYYYMMDD}{NNN}.xml`.
+- El runner de GitHub Actions sufre timeouts intermitentes contra `boe.es` — implementado fallback automático a `www.boe.es` (y viceversa) ante `ConnectionError`/`Timeout`. Timeouts subidos: API 45s, body 30s, probe 30s.
+- El extractor heurístico es agresivo a propósito; el enricher Claude es el filtro discriminador real (en el primer run filtró 3/3 matches como `is_relevant=false`).
 
 ### Sprint 2 — APIs privadas
 Mercado privado con dos integraciones limpias.

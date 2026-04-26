@@ -6,9 +6,13 @@ Hermano de [vigia-enfermeria](https://github.com/tragabytes/vigia-enfermeria), r
 
 ## Estado
 
-**Sprint 1 — Núcleo público** (en curso). Cubre BOE + BOCM (vía RSS).
+**Sprint 1 — Núcleo público** ✅ desplegado (2026-04-26). Cubre BOE + BOCM (vía RSS).
 
-Ver [`plan_profe.md`](plan_profe.md) para el roadmap completo.
+- Dashboard en vivo: https://tragabytes.github.io/alerta-empleo-profe/
+- Cron diario: lunes-viernes 08:00 UTC (~10:00 hora España)
+- 41 tests verdes
+
+Ver [`plan_profe.md`](plan_profe.md) para el roadmap completo (sprints 2-9).
 
 ## Arquitectura
 
