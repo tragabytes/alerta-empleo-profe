@@ -1,0 +1,20 @@
+{
+  "total_items": 0,
+  "total_today": 0,
+  "total_relevant": 0,
+  "total_irrelevant": 0,
+  "total_enriched": 0,
+  "total_open_deadlines": 0,
+  "by_category": {},
+  "days_watching": 0,
+  "first_seen_at": null,
+  "last_run_at": "2026-04-26T15:43:14.443330+00:00",
+  "next_run_at": "2026-04-27T08:00:00+00:00",
+  "sources_online": 2,
+  "sources_total": 2,
+  "targets_active": 0,
+  "targets_urgent": 0,
+  "targets_total": 25,
+  "version": "0.1.0",
+  "commit": "0eb1bf3"
+}

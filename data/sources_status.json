@@ -1,0 +1,20 @@
+[
+  {
+    "name": "bocm",
+    "url": "https://www.bocm.es/ultimo-boletin.xml",
+    "status": "ok",
+    "code": 200,
+    "detail": "",
+    "last_probe_at": "2026-04-26T15:43:14.443330+00:00",
+    "total_hits": 0
+  },
+  {
+    "name": "boe",
+    "url": "https://boe.es/datosabiertos/",
+    "status": "ok",
+    "code": 200,
+    "detail": "",
+    "last_probe_at": "2026-04-26T15:43:14.443330+00:00",
+    "total_hits": 0
+  }
+]
