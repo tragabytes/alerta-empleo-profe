@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import logging
 from datetime import date, timedelta
+from urllib.parse import urlparse, urlunparse
 
 import requests
 
@@ -29,7 +30,26 @@ from vigia.sources.base import RawItem, Source
 
 logger = logging.getLogger(__name__)
 
-BOE_SUMARIO_URL = "https://boe.es/datosabiertos/api/boe/sumario/{fecha}"
+# Endpoints — usamos `www.boe.es` como canónico (boe.es a secas redirige
+# casi siempre, pero el redirect es lo primero que falla cuando el runner
+# de GitHub Actions cae en un rango IP problemático). El helper
+# `_get_with_host_fallback` se encarga de probar el host alternativo si el
+# primario timeoutea o rechaza la conexión.
+BOE_SUMARIO_URL = "https://www.boe.es/datosabiertos/api/boe/sumario/{fecha}"
+
+# Pareja primario / fallback. La elección de cuál es primario y cuál
+# fallback la determina el host de la URL que se pasa al helper.
+_HOST_FALLBACKS = {
+    "www.boe.es": "boe.es",
+    "boe.es": "www.boe.es",
+}
+
+# Timeouts (segundos). Subimos de los 20s originales tras observar timeouts
+# intermitentes desde el runner de GitHub Actions; con 45s damos margen al
+# servidor cuando está lento sin bloquear el run completo.
+TIMEOUT_API = 45     # sumario JSON
+TIMEOUT_BODY = 30    # HTML del cuerpo
+TIMEOUT_PROBE = 30   # HEAD/GET ligero de probe
 
 # Secciones que pueden contener convocatorias docentes
 SECTIONS_TO_FETCH_BODY = {"2A", "2B", "3"}
@@ -75,7 +95,77 @@ TITLE_FAST_KEYWORDS = [
 class BOESource(Source):
     name = "boe"
     # Probe: la home del API de datos abiertos. No depende de fecha.
-    probe_url = "https://boe.es/datosabiertos/"
+    probe_url = "https://www.boe.es/datosabiertos/"
+
+    def _get_with_host_fallback(
+        self,
+        url: str,
+        *,
+        timeout: int,
+        method: str = "GET",
+        **kwargs,
+    ) -> requests.Response:
+        """
+        GET/HEAD con fallback automático entre `boe.es` y `www.boe.es`.
+
+        Si el host primario timeoutea o rechaza la conexión, reintenta en
+        el otro. Errores HTTP (4xx/5xx) NO disparan fallback — sólo problemas
+        de red, donde el otro host puede vivir en una IP distinta y responder.
+        """
+        parsed = urlparse(url)
+        host = (parsed.hostname or "").lower()
+        fallback_host = _HOST_FALLBACKS.get(host)
+
+        try:
+            return requests.request(method, url, timeout=timeout, **kwargs)
+        except (requests.ConnectionError, requests.Timeout) as exc:
+            if not fallback_host:
+                raise
+            new_url = urlunparse(parsed._replace(netloc=fallback_host))
+            logger.warning(
+                "BOE %s falló (%s); reintentando en %s",
+                host, exc.__class__.__name__, fallback_host,
+            )
+            return requests.request(method, new_url, timeout=timeout, **kwargs)
+
+    def probe(self, timeout: int = TIMEOUT_PROBE) -> dict:
+        """Probe con fallback de host (sobreescribe al de Source)."""
+        if not self.probe_url:
+            return {
+                "name": self.name, "status": "skipped", "code": None,
+                "url": None, "detail": "fuente sin probe_url",
+            }
+        try:
+            resp = self._get_with_host_fallback(
+                self.probe_url,
+                timeout=timeout,
+                method="HEAD",
+                headers=self._default_headers(),
+                allow_redirects=True,
+            )
+            if resp.status_code >= 400:
+                # Algunos servidores rechazan HEAD; reintenta con GET stream.
+                resp = self._get_with_host_fallback(
+                    self.probe_url,
+                    timeout=timeout,
+                    method="GET",
+                    headers=self._default_headers(),
+                    allow_redirects=True,
+                    stream=True,
+                )
+                resp.close()
+        except Exception as exc:
+            return {
+                "name": self.name, "status": "error", "code": None,
+                "url": self.probe_url, "detail": str(exc),
+            }
+        return {
+            "name": self.name,
+            "status": "ok" if resp.status_code < 400 else "error",
+            "code": resp.status_code,
+            "url": self.probe_url,
+            "detail": "" if resp.status_code < 400 else resp.reason,
+        }
 
     def fetch(self, since_date: date) -> list[RawItem]:
         items: list[RawItem] = []
@@ -92,10 +182,10 @@ class BOESource(Source):
 
     def _fetch_day(self, target: date) -> list[RawItem]:
         url = BOE_SUMARIO_URL.format(fecha=target.strftime("%Y%m%d"))
-        resp = requests.get(
+        resp = self._get_with_host_fallback(
             url,
+            timeout=TIMEOUT_API,
             headers={**self._default_headers(), "Accept": "application/json"},
-            timeout=20,
         )
         if resp.status_code == 404:
             return []  # día sin BOE (festivo nacional)
@@ -206,7 +296,9 @@ class BOESource(Source):
         """Descarga el HTML de un ítem BOE y extrae el texto plano."""
         from bs4 import BeautifulSoup
 
-        resp = requests.get(url, headers=self._default_headers(), timeout=15)
+        resp = self._get_with_host_fallback(
+            url, timeout=TIMEOUT_BODY, headers=self._default_headers(),
+        )
         resp.raise_for_status()
         soup = BeautifulSoup(resp.text, "lxml")
         # El contenido del BOE está en div#textoxslt o div.diari-boe
