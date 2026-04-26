@@ -1,6 +1,14 @@
 [
   {
     "date": "2026-04-26",
+    "commit": "8898664",
+    "kind": "fix",
+    "scope": "boe",
+    "title": "host fallback boe.es <-> www.boe.es and longer timeouts",
+    "body": "Observed in CI: intermittent ConnectTimeoutError on boe.es from the"
+  },
+  {
+    "date": "2026-04-26",
     "commit": "0eb1bf3",
     "kind": "feat",
     "scope": "",

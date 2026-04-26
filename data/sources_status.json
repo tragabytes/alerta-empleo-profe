@@ -5,16 +5,16 @@
     "status": "ok",
     "code": 200,
     "detail": "",
-    "last_probe_at": "2026-04-26T19:11:23.742352+00:00",
+    "last_probe_at": "2026-04-26T19:29:18.114530+00:00",
     "total_hits": 0
   },
   {
     "name": "boe",
-    "url": "https://boe.es/datosabiertos/",
-    "status": "error",
-    "code": null,
-    "detail": "HTTPSConnectionPool(host='boe.es', port=443): Max retries exceeded with url: /datosabiertos/ (Caused by ConnectTimeoutError(<HTTPSConnection(host='boe.es', port=443) at 0x7fe9225f3090>, 'Connection to boe.es timed out. (connect timeout=10)'))",
-    "last_probe_at": "2026-04-26T19:11:23.742352+00:00",
-    "total_hits": 0
+    "url": "https://www.boe.es/datosabiertos/",
+    "status": "ok",
+    "code": 200,
+    "detail": "",
+    "last_probe_at": "2026-04-26T19:29:18.114530+00:00",
+    "total_hits": 3
   }
 ]
