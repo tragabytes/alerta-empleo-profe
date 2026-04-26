@@ -1,0 +1,215 @@
+"""
+Notificador Telegram.
+
+Recibe lista de Item (ya filtrados por el extractor y opcionalmente
+enriquecidos por enricher.py) y envía un mensaje Markdown agrupado.
+"""
+from __future__ import annotations
+
+import logging
+import os
+from datetime import date
+from typing import Optional
+
+import requests
+
+from vigia.config import TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID, USER_AGENT
+from vigia.storage import Item
+
+logger = logging.getLogger(__name__)
+
+PROCESS_TYPE_LABEL = {
+    "oposicion":          "Oposición",
+    "bolsa":              "Bolsa / interinidad",
+    "concurso_traslados": "Concurso traslados",
+    "interinaje":         "Interinaje",
+    "temporal":           "Contrato temporal",
+    "lectorado":          "Lectorado",
+    "auxiliar":           "Auxiliar conversación",
+    "privada":            "Colegio privado",
+    "ele":                "ELE / academia",
+    "otro":               "Otro",
+}
+
+FASE_LABEL = {
+    "convocatoria":           "Convocatoria",
+    "admitidos_provisional":  "Admitidos provisional",
+    "admitidos_definitivo":   "Admitidos definitivo",
+    "examen":                 "Fechas de examen",
+    "calificacion":           "Calificación",
+    "propuesta_nombramiento": "Propuesta de nombramiento",
+    "otro":                   "Actualización",
+}
+
+TELEGRAM_API = "https://api.telegram.org/bot{token}/sendMessage"
+MAX_MESSAGE_LEN = 4096  # límite de Telegram
+
+# URL pública del dashboard. Se sobrescribe con la env var DASHBOARD_URL en CI
+# si se publica desde otro repo / org. Por defecto apunta al placeholder.
+DASHBOARD_URL = os.environ.get(
+    "DASHBOARD_URL",
+    "https://tragabytes.github.io/alerta-empleo-profe/",
+)
+
+
+def send(
+    items: list[Item],
+    errors: list[tuple[str, str]],
+    run_date: Optional[date] = None,
+) -> None:
+    """
+    Envía el resumen del día a Telegram.
+
+    :param items:    Hallazgos nuevos ya deduplicados.
+    :param errors:   Lista de (nombre_fuente, mensaje_error) para fuentes que fallaron.
+    :param run_date: Fecha de la ejecución; si None, usa hoy.
+    """
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        logger.warning("Credenciales Telegram no configuradas — notificación omitida")
+        return
+
+    today = run_date or date.today()
+    message = _build_message(items, errors, today)
+
+    for chunk in _split(message):
+        _send_chunk(chunk)
+
+
+def send_test(message: str = "✅ vigia-profe: conexión OK") -> None:
+    """Envía un mensaje de prueba para validar credenciales."""
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        raise RuntimeError(
+            "TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID deben estar en las variables de entorno"
+        )
+    _send_chunk(message)
+    logger.info("Mensaje de prueba enviado correctamente")
+
+
+# ---------------------------------------------------------------------------
+# Funciones internas
+# ---------------------------------------------------------------------------
+
+def _build_message(items: list[Item], errors: list[tuple[str, str]], today: date) -> str:
+    fecha_str = today.strftime("%d/%m/%Y")
+    lines: list[str] = [f"🔔 *Alerta Empleo Docente — {fecha_str}*\n"]
+
+    if items:
+        for item in items:
+            lines.extend(_format_item(item, today))
+            lines.append("")
+    else:
+        lines.append("Sin novedades hoy.\n")
+
+    for source_name, err_msg in errors:
+        lines.append(f"⚠️ Fuente *{_escape(source_name)}* no respondió: {_escape(err_msg)}")
+
+    lines.append("")
+    lines.append(f"🛰️ Panel completo: {DASHBOARD_URL}")
+
+    return "\n".join(lines)
+
+
+def _format_item(item: Item, today: date) -> list[str]:
+    """Bloque por convocatoria, aprovechando los campos del enricher v2."""
+    block: list[str] = []
+    header = f"🟢 *NUEVO en {item.source.upper()}*"
+    if item.organismo:
+        header += f" — {_escape(item.organismo)}"
+    block.append(header)
+    block.append(f"*{_escape(item.titulo)}*")
+
+    proc_bits: list[str] = []
+    if item.process_type:
+        proc_bits.append(PROCESS_TYPE_LABEL.get(item.process_type, item.process_type))
+    if item.plazas:
+        proc_bits.append(f"{item.plazas} plazas")
+    if item.tasas_eur is not None:
+        proc_bits.append(_format_eur(item.tasas_eur) + " tasa")
+    if proc_bits:
+        block.append("📊 " + " · ".join(_escape(b) for b in proc_bits))
+
+    if item.deadline_inscripcion:
+        countdown = _format_countdown(item.deadline_inscripcion, today)
+        if countdown:
+            block.append(f"⏰ {countdown}")
+
+    if item.fase and item.fase not in ("convocatoria", "otro"):
+        fase_label = FASE_LABEL.get(item.fase, item.fase)
+        block.append(f"🪪 Fase: {_escape(fase_label)}")
+
+    if item.next_action:
+        block.append(f"🎯 {_escape(item.next_action)}")
+
+    if item.summary:
+        block.append(f"_{_escape(item.summary)}_")
+
+    block.append(f"🔗 {item.url}")
+    if item.url_bases and item.url_bases != item.url:
+        block.append(f"📎 Bases: {item.url_bases}")
+
+    block.append(f"📌 {_escape(item.categoria)}")
+    return block
+
+
+def _format_countdown(deadline_iso: str, today: date) -> Optional[str]:
+    try:
+        dl = date.fromisoformat(deadline_iso)
+    except ValueError:
+        return None
+    days = (dl - today).days
+    fecha_es = dl.strftime("%d/%m/%Y")
+    if days < 0:
+        return f"Cierre: {fecha_es} (cerrado hace {-days} días)"
+    if days == 0:
+        return f"Cierre: {fecha_es} (HOY)"
+    if days == 1:
+        return f"Cierre: {fecha_es} (mañana)"
+    return f"Cierre: {fecha_es} (en {days} días)"
+
+
+def _format_eur(amount: float) -> str:
+    if abs(amount - round(amount)) < 0.005:
+        return f"{int(round(amount))}€"
+    return f"{amount:.2f}€".replace(".", ",")
+
+
+def _escape(text: str) -> str:
+    """Escapa caracteres especiales para Markdown v1 de Telegram."""
+    for ch in ("_", "*", "`", "["):
+        text = text.replace(ch, f"\\{ch}")
+    return text
+
+
+def _split(text: str) -> list[str]:
+    if len(text) <= MAX_MESSAGE_LEN:
+        return [text]
+    chunks = []
+    while text:
+        chunks.append(text[:MAX_MESSAGE_LEN])
+        text = text[MAX_MESSAGE_LEN:]
+    return chunks
+
+
+def _chat_ids() -> list[str]:
+    return [c.strip() for c in TELEGRAM_CHAT_ID.split(",") if c.strip()]
+
+
+def _send_chunk(text: str) -> None:
+    url = TELEGRAM_API.format(token=TELEGRAM_BOT_TOKEN)
+    for chat_id in _chat_ids():
+        resp = requests.post(
+            url,
+            json={
+                "chat_id": chat_id,
+                "text": text,
+                "parse_mode": "Markdown",
+                "disable_web_page_preview": True,
+            },
+            headers={"User-Agent": USER_AGENT},
+            timeout=15,
+        )
+        if not resp.ok:
+            logger.error(
+                "Telegram error chat_id=%s status=%s body=%s",
+                chat_id, resp.status_code, resp.text[:200],
+            )

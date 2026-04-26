@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.venv/
+venv/
+env/
+*.egg-info/
+
+# Estado local del bot (en CI vive en rama 'state')
+state/
+docs/data/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Local secrets (nunca commitear)
+.env
+.env.local
+*.secret
+
+# Claude Code (config local)
+.claude/
