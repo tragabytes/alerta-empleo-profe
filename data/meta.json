@@ -1,6 +1,6 @@
 {
   "total_items": 3,
-  "total_today": 3,
+  "total_today": 0,
   "total_relevant": 0,
   "total_irrelevant": 3,
   "total_enriched": 3,
@@ -11,13 +11,13 @@
   },
   "days_watching": 0,
   "first_seen_at": "2026-04-26T19:28:50.171469",
-  "last_run_at": "2026-04-26T19:29:18.114530+00:00",
-  "next_run_at": "2026-04-27T08:00:00+00:00",
+  "last_run_at": "2026-04-27T10:04:46.221353+00:00",
+  "next_run_at": "2026-04-28T08:00:00+00:00",
   "sources_online": 2,
   "sources_total": 2,
   "targets_active": 0,
   "targets_urgent": 0,
   "targets_total": 25,
   "version": "0.1.0",
-  "commit": "8898664"
+  "commit": "cd2b020"
 }
