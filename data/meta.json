@@ -1,19 +1,19 @@
 {
-  "total_items": 6,
-  "total_today": 1,
+  "total_items": 8,
+  "total_today": 2,
   "total_relevant": 0,
-  "total_irrelevant": 6,
-  "total_enriched": 6,
+  "total_irrelevant": 8,
+  "total_enriched": 8,
   "total_open_deadlines": 0,
   "by_category": {
     "nombramiento": 3,
-    "oposicion": 2,
-    "traslado": 1
+    "oposicion": 3,
+    "traslado": 2
   },
-  "days_watching": 2,
+  "days_watching": 3,
   "first_seen_at": "2026-04-26T19:28:50.171469",
-  "last_run_at": "2026-04-29T09:56:56.096847+00:00",
-  "next_run_at": "2026-04-30T08:00:00+00:00",
+  "last_run_at": "2026-04-30T09:57:30.584278+00:00",
+  "next_run_at": "2026-05-01T08:00:00+00:00",
   "sources_online": 2,
   "sources_total": 2,
   "targets_active": 0,
