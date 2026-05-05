@@ -5,7 +5,7 @@
     "status": "ok",
     "code": 200,
     "detail": "",
-    "last_probe_at": "2026-05-04T10:06:16.675910+00:00",
+    "last_probe_at": "2026-05-05T09:54:00.226221+00:00",
     "total_hits": 1
   },
   {
@@ -14,7 +14,7 @@
     "status": "ok",
     "code": 200,
     "detail": "",
-    "last_probe_at": "2026-05-04T10:06:16.675910+00:00",
-    "total_hits": 10
+    "last_probe_at": "2026-05-05T09:54:00.226221+00:00",
+    "total_hits": 27
   }
 ]
