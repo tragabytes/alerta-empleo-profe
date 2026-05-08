@@ -3,13 +3,15 @@
     "id": "T-01",
     "name": "Consejería de Educación CM",
     "desc": "Comunidad de Madrid — Consejería de Educación, Ciencia y Universidades",
-    "hits": 0,
-    "active": false,
+    "hits": 1,
+    "active": true,
     "nearest_deadline": null,
     "days_until": null,
     "urgent": false,
-    "latest_phase": null,
-    "item_ids": []
+    "latest_phase": "propuesta_nombramiento",
+    "item_ids": [
+      "e473d71ab78a71e4"
+    ]
   },
   {
     "id": "T-02",
@@ -75,13 +77,15 @@
     "id": "T-07",
     "name": "EOI Madrid",
     "desc": "Escuelas Oficiales de Idiomas (especialidad 008)",
-    "hits": 0,
-    "active": false,
+    "hits": 1,
+    "active": true,
     "nearest_deadline": null,
     "days_until": null,
     "urgent": false,
-    "latest_phase": null,
-    "item_ids": []
+    "latest_phase": "propuesta_nombramiento",
+    "item_ids": [
+      "e473d71ab78a71e4"
+    ]
   },
   {
     "id": "T-08",

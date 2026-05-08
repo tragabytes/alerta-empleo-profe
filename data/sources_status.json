@@ -5,8 +5,8 @@
     "status": "ok",
     "code": 200,
     "detail": "",
-    "last_probe_at": "2026-05-07T10:13:57.010805+00:00",
-    "total_hits": 5
+    "last_probe_at": "2026-05-08T09:04:34.107472+00:00",
+    "total_hits": 7
   },
   {
     "name": "boe",
@@ -14,7 +14,7 @@
     "status": "ok",
     "code": 200,
     "detail": "",
-    "last_probe_at": "2026-05-07T10:13:57.010805+00:00",
-    "total_hits": 29
+    "last_probe_at": "2026-05-08T09:04:34.107472+00:00",
+    "total_hits": 31
   }
 ]
