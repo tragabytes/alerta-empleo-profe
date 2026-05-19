@@ -1,5 +1,36 @@
 [
   {
+    "id_hash": "be7a6478464ef6af",
+    "source": "boe",
+    "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-B-2026-16152",
+    "titulo": "Extracto de la Resolución de 13 de mayo de 2026, de la Subsecretaría de Educación, Formación Profesional y Deportes, por la que se convocan plazas para auxiliares de conversación extranjeros para el curso académico 2026-2027",
+    "fecha": "2026-05-19",
+    "categoria": "lectorado",
+    "first_seen_at": "2026-05-19T10:53:31.000547",
+    "summary": "Plazas de auxiliares de conversación extranjeros en España curso 2026-27. Ciudadanos de países convenio con titulación univ. o estudiantes 2º curso. Idiomas: alemán, chino, francés, inglés, italiano, portugués. Ayuda: 5.600 €/curso + seguro médico + formación.",
+    "is_relevant": false,
+    "relevance_reason": "Convocatoria para auxiliares de conversación EXTRANJEROS (ciudadanos de otros países) que vienen a España a practicar alemán, chino, francés, inglés, italiano o portugués. No aplica al perfil objetivo: no es PES Geografía e Historia, ni EOI ELE, ni lectorado AECID para españoles en el exterior, ni plaza docente en Madrid.",
+    "process_type": "auxiliar",
+    "organismo": "Ministerio de Educación, Formación Profesional y Deportes",
+    "centro": null,
+    "plazas": null,
+    "deadline_inscripcion": "2026-06-30",
+    "fecha_publicacion_oficial": "2026-05-19",
+    "tasas_eur": null,
+    "url_bases": "https://www.infosubvenciones.es/bdnstrans/GE/es/convocatoria/905639",
+    "url_inscripcion": "https://www.infosubvenciones.es/bdnstrans/GE/es/convocatoria/905639",
+    "requisitos_clave": [
+      "Ciudadanía o residencia permanente en uno de los países listados en el convenio",
+      "Titulación universitaria obtenida o estar cursando mínimo 2º curso universitario",
+      "Lengua materna/perfil en alemán, chino, francés, inglés, italiano o portugués"
+    ],
+    "fase": "convocatoria",
+    "next_action": "Presentar solicitud en la BDNS (infosubvenciones.es) entre el 02/06/2026 y el 30/06/2026.",
+    "confidence": 0.93,
+    "enriched_at": "2026-05-19T10:53:45.961262+00:00",
+    "enriched_version": 2
+  },
+  {
     "id_hash": "de6f04d5e55427f7",
     "source": "boe",
     "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-10738",
