@@ -18,13 +18,15 @@
     "id": "T-02",
     "name": "Ministerio de Educación",
     "desc": "Ministerio de Educación, Formación Profesional y Deportes (MEFD)",
-    "hits": 0,
-    "active": false,
-    "nearest_deadline": null,
-    "days_until": null,
+    "hits": 1,
+    "active": true,
+    "nearest_deadline": "2026-06-30",
+    "days_until": 41,
     "urgent": false,
-    "latest_phase": null,
-    "item_ids": []
+    "latest_phase": "convocatoria",
+    "item_ids": [
+      "2f41268b400189b1"
+    ]
   },
   {
     "id": "T-03",
@@ -54,13 +56,15 @@
     "id": "T-05",
     "name": "MEFP Auxiliares",
     "desc": "Profex 2 — auxiliares de conversación en el extranjero",
-    "hits": 0,
-    "active": false,
-    "nearest_deadline": null,
-    "days_until": null,
+    "hits": 1,
+    "active": true,
+    "nearest_deadline": "2026-06-30",
+    "days_until": 41,
     "urgent": false,
-    "latest_phase": null,
-    "item_ids": []
+    "latest_phase": "convocatoria",
+    "item_ids": [
+      "2f41268b400189b1"
+    ]
   },
   {
     "id": "T-06",
