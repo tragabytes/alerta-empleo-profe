@@ -1,9 +1,11 @@
 name: alerta-empleo-profe daily
 
 on:
-  schedule:
-    # Lunes-viernes a las 09:00 hora España (08:00 UTC en verano)
-    - cron: '0 8 * * 1-5'
+  # CRON DESACTIVADO en el cutover a vigia-docencia (2026-06-02): el bot docente
+  # ahora vive en github.com/tragabytes/vigia-docencia (consume vigia-core). Este
+  # repo (fork monolítico) queda como fallback MANUAL hasta su archivado.
+  # schedule:
+  #   - cron: '0 8 * * 1-5'
   workflow_dispatch:
     inputs:
       since:
