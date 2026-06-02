@@ -3,7 +3,7 @@
     "id": "T-01",
     "name": "Consejería de Educación CM",
     "desc": "Comunidad de Madrid — Consejería de Educación, Ciencia y Universidades",
-    "hits": 2,
+    "hits": 3,
     "active": true,
     "nearest_deadline": null,
     "days_until": null,
@@ -11,7 +11,8 @@
     "latest_phase": "convocatoria",
     "item_ids": [
       "e473d71ab78a71e4",
-      "bd142fa527600138"
+      "bd142fa527600138",
+      "b3db5ce4c2115a74"
     ]
   },
   {
@@ -21,7 +22,7 @@
     "hits": 1,
     "active": true,
     "nearest_deadline": "2026-06-30",
-    "days_until": 29,
+    "days_until": 28,
     "urgent": false,
     "latest_phase": "convocatoria",
     "item_ids": [
@@ -59,7 +60,7 @@
     "hits": 1,
     "active": true,
     "nearest_deadline": "2026-06-30",
-    "days_until": 29,
+    "days_until": 28,
     "urgent": false,
     "latest_phase": "convocatoria",
     "item_ids": [
